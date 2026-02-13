@@ -1,6 +1,6 @@
-# PowerSchool Multi-Platform AI Assistant - Developer Guide
+# Multi-Platform AI Assistant - Developer Guide
 
-A production-ready TypeScript Node.js API service that provides intelligent question-answering capabilities for PowerSchool documentation using RAG (Retrieval-Augmented Generation) technology. Supports multiple knowledge bases including **PSSIS-Admin** and **Schoology** documentation with collection-based separation, accessible through both **Slack** and **Microsoft Teams** platforms.
+A production-ready TypeScript Node.js API service that provides intelligent question-answering capabilities for documentation using RAG (Retrieval-Augmented Generation) technology. Supports multiple knowledge bases with collection-based separation, accessible through both **Slack** and **Microsoft Teams** platforms.
 
 ## 📋 Table of Contents
 
@@ -128,7 +128,7 @@ sudo apt install docker-compose-plugin
 
 ```bash
 git clone <your-repository-url>
-cd powerschool-rag-api
+cd qlarity-ai-assistant
 ```
 
 ### 2. Install Dependencies
@@ -155,7 +155,7 @@ NODE_ENV=development
 LOG_LEVEL=info
 
 # Database Configuration
-DATABASE_URL=postgresql://postgres:password@localhost:5432/powerschool_rag
+DATABASE_URL=postgresql://postgres:password@localhost:5432/qlarity_rag
 VECTOR_TABLE_NAME=documents
 
 # Provider Selection (Choose your AI provider)
@@ -193,17 +193,17 @@ MAX_QUERY_LENGTH=1000
 ADMIN_API_KEY=your-admin-secret-key-here
 
 # Collection Configuration
-DEFAULT_COLLECTION=pssis-admin
+DEFAULT_COLLECTION=collection-a
 
-# PSSIS-Admin Crawling Configuration
-PSSIS_CRAWL_BASE_URL=https://ps.powerschool-docs.com/pssis-admin/latest/
-PSSIS_CRAWL_DELAY_MS=1000
-PSSIS_MAX_PAGES=1000
+# Collection A Crawling Configuration
+COLLECTION_A_CRAWL_BASE_URL=https://docs.example.com/collection-a/latest/
+COLLECTION_A_CRAWL_DELAY_MS=1000
+COLLECTION_A_MAX_PAGES=1000
 
-# Schoology Crawling Configuration
-SCHOOLOGY_CRAWL_BASE_URL=https://uc.powerschool-docs.com/en/schoology/latest/
-SCHOOLOGY_CRAWL_DELAY_MS=1000
-SCHOOLOGY_MAX_PAGES=1000
+# Collection B Crawling Configuration
+COLLECTION_B_CRAWL_BASE_URL=https://docs.example.com/collection-b/latest/
+COLLECTION_B_CRAWL_DELAY_MS=1000
+COLLECTION_B_MAX_PAGES=1000
 
 # Optional: Alternative API Providers
 # OPENROUTER_API_KEY=your-openrouter-key-here
@@ -234,9 +234,9 @@ SCHOOLOGY_MAX_PAGES=1000
 | `TEAMS_APP_PASSWORD` | Microsoft Teams App Password (optional) | From Azure AD app registration |
 | `TEAMS_VERIFIED_TENANTS` | Comma-separated tenant IDs (optional) | `tenant-id-1,tenant-id-2` |
 | `ADMIN_API_KEY` | Admin endpoint authentication | Any secure string |
-| `DEFAULT_COLLECTION` | Default knowledge base collection | `pssis-admin`, `schoology` |
-| `PSSIS_CRAWL_BASE_URL` | PSSIS-Admin docs base URL | URL to crawl |
-| `SCHOOLOGY_CRAWL_BASE_URL` | Schoology docs base URL | URL to crawl |
+| `DEFAULT_COLLECTION` | Default knowledge base collection | `collection-a`, `collection-b` |
+| `COLLECTION_A_CRAWL_BASE_URL` | Collection A docs base URL | URL to crawl |
+| `COLLECTION_B_CRAWL_BASE_URL` | Collection B docs base URL | URL to crawl |
 
 ### 5. Generate API Keys
 
@@ -301,10 +301,10 @@ To request model access:
 psql -U postgres
 
 # Create database
-CREATE DATABASE powerschool_rag;
+CREATE DATABASE qlarity_rag;
 
 # Grant permissions (adjust username as needed)
-GRANT ALL PRIVILEGES ON DATABASE powerschool_rag TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE qlarity_rag TO postgres;
 
 # Exit psql
 \q
@@ -314,7 +314,7 @@ GRANT ALL PRIVILEGES ON DATABASE powerschool_rag TO postgres;
 
 ```sql
 -- Connect to your database
-psql -U postgres -d powerschool_rag
+psql -U postgres -d qlarity_rag
 
 -- Enable pgvector extension
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -361,8 +361,8 @@ The API supports multiple knowledge bases through a **collection-based architect
 
 | Collection | Description | Documentation Source |
 |------------|-------------|---------------------|
-| `pssis-admin` | PowerSchool PSSIS-Admin documentation | https://ps.powerschool-docs.com/pssis-admin/latest/ |
-| `schoology` | Schoology Learning Management System documentation | https://uc.powerschool-docs.com/en/schoology/latest/ |
+| `collection-a` | Primary documentation collection | https://docs.example.com/collection-a/latest/ |
+| `collection-b` | Secondary documentation collection | https://docs.example.com/collection-b/latest/ |
 
 ### Collection Isolation
 
@@ -381,53 +381,53 @@ The API supports multiple knowledge bases through a **collection-based architect
 
 ## 📚 Seeding Documentation
 
-The seeding process downloads and indexes PowerSchool documentation into the vector database. The system supports multiple collections with independent seeding capabilities.
+The seeding process downloads and indexes documentation into the vector database. The system supports multiple collections with independent seeding capabilities.
 
 ### 1. Available Seeding Commands
 
 ```bash
 # Seed specific collections
-npm run seed:pssis-admin    # Seed PSSIS-Admin documentation
-npm run seed:schoology      # Seed Schoology documentation
+npm run seed:collection-a    # Seed Collection A documentation
+npm run seed:collection-b    # Seed Collection B documentation
 
 # Utility commands
 npm run seed:stats          # Show collection statistics
 npm run seed:clear          # Clear all collections (with confirmation)
 
-# Legacy command (defaults to pssis-admin)
-npm run seed               # Equivalent to seed:pssis-admin
+# Legacy command (defaults to collection-a)
+npm run seed               # Equivalent to seed:collection-a
 ```
 
 ### 2. Collection-Specific Seeding
 
-**PSSIS-Admin Documentation:**
+**Collection A Documentation:**
 ```bash
-npm run seed:pssis-admin
+npm run seed:collection-a
 
 # Output:
-# 🚀 Seeding pssis-admin collection...
-# 📋 Collection: pssis-admin
-# 🌐 Base URL: https://ps.powerschool-docs.com/pssis-admin/latest/
+# 🚀 Seeding collection-a collection...
+# 📋 Collection: collection-a
+# 🌐 Base URL: https://docs.example.com/collection-a/latest/
 # 📄 Max Pages: 1000
 # ⏱️ Crawl Delay: 1000ms
-# Crawling [1/1000]: https://ps.powerschool-docs.com/pssis-admin/latest/
+# Crawling [1/1000]: https://docs.example.com/collection-a/latest/
 # ...
-# ✅ Seeded 506 documents into pssis-admin collection
+# ✅ Seeded 506 documents into collection-a collection
 ```
 
-**Schoology Documentation:**
+**Collection B Documentation:**
 ```bash
-npm run seed:schoology
+npm run seed:collection-b
 
 # Output:
-# 🚀 Seeding schoology collection...
-# 📋 Collection: schoology
-# 🌐 Base URL: https://uc.powerschool-docs.com/en/schoology/latest/
+# 🚀 Seeding collection-b collection...
+# 📋 Collection: collection-b
+# 🌐 Base URL: https://docs.example.com/collection-b/latest/
 # 📄 Max Pages: 1000
 # ⏱️ Crawl Delay: 1000ms
-# Crawling [1/1000]: https://uc.powerschool-docs.com/en/schoology/latest/
+# Crawling [1/1000]: https://docs.example.com/collection-b/latest/
 # ...
-# ✅ Seeded 235 documents into schoology collection
+# ✅ Seeded 235 documents into collection-b collection
 ```
 
 ### 3. What the Seed Process Does
@@ -446,7 +446,7 @@ The collection-aware seed command:
 **Real-time Progress:**
 ```bash
 # During seeding, you'll see detailed progress:
-Crawling [50/1000]: https://uc.powerschool-docs.com/en/schoology/latest/courses-grades-students
+Crawling [50/1000]: https://docs.example.com/collection-b/latest/courses-grades-students
 🔍 Generated embedding with 1024 dimensions (expected: 1024)
 📄 Document "Course Materials" chunked into 3 pieces
 🔄 Processing batch 5/15 (10 documents)...
@@ -459,13 +459,13 @@ npm run seed:stats
 # Output:
 # 📊 Collection Statistics:
 #
-# Collection: pssis-admin
+# Collection: collection-a
 # - Documents: 506
 # - Total Chunks: 506
 # - Vector Dimensions: 1024
 # - Index Size: ~15MB
 #
-# Collection: schoology
+# Collection: collection-b
 # - Documents: 235
 # - Total Chunks: 235
 # - Vector Dimensions: 1024
@@ -479,19 +479,19 @@ npm run seed:stats
 
 Edit your `.env` file to customize crawling per collection:
 ```env
-# PSSIS-Admin Configuration
-PSSIS_CRAWL_BASE_URL=https://ps.powerschool-docs.com/pssis-admin/latest/
-PSSIS_CRAWL_DELAY_MS=1000
-PSSIS_MAX_PAGES=500
+# Collection A Configuration
+COLLECTION_A_CRAWL_BASE_URL=https://docs.example.com/collection-a/latest/
+COLLECTION_A_CRAWL_DELAY_MS=1000
+COLLECTION_A_MAX_PAGES=500
 
-# Schoology Configuration
-SCHOOLOGY_CRAWL_BASE_URL=https://uc.powerschool-docs.com/en/schoology/latest/
-SCHOOLOGY_CRAWL_DELAY_MS=1500
-SCHOOLOGY_MAX_PAGES=200
+# Collection B Configuration
+COLLECTION_B_CRAWL_BASE_URL=https://docs.example.com/collection-b/latest/
+COLLECTION_B_CRAWL_DELAY_MS=1500
+COLLECTION_B_MAX_PAGES=200
 
 # For faster testing
-PSSIS_MAX_PAGES=50
-SCHOOLOGY_MAX_PAGES=30
+COLLECTION_A_MAX_PAGES=50
+COLLECTION_B_MAX_PAGES=30
 ```
 
 ### 6. Database Migration & Collection Support
@@ -502,7 +502,7 @@ Before seeding, ensure your database supports the collection field:
 npm run db:migrate
 
 # The migration adds:
-# - collection VARCHAR(50) DEFAULT 'pssis-admin'
+# - collection VARCHAR(50) DEFAULT 'collection-a'
 # - Index on (collection, embedding) for optimized filtering
 # - Updated queries to support collection-based filtering
 ```
@@ -550,7 +550,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: powerschool_rag
+      POSTGRES_DB: qlarity_rag
     ports:
       - "5432:5432"
     volumes:
@@ -561,7 +561,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/powerschool_rag
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/qlarity_rag
       OPENAI_API_KEY: ${OPENAI_API_KEY}
     depends_on:
       - postgres
@@ -634,16 +634,16 @@ All API endpoints now support collection-specific operations to ensure proper kn
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How do I configure attendance codes?",
-    "collection": "pssis-admin"
+    "query": "How do I configure the system?",
+    "collection": "collection-a"
   }'
 
-# Query Schoology collection
+# Query Collection B
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How do I create a course in Schoology?",
-    "collection": "schoology"
+    "query": "How do I create a new resource?",
+    "collection": "collection-b"
   }'
 
 # Default collection (if no collection specified)
@@ -658,7 +658,7 @@ curl -X POST http://localhost:3000/api/v1/ask \
 ```typescript
 interface AskRequest {
   query: string;                    // Your question (required)
-  collection?: string;              // Collection to search ('pssis-admin' | 'schoology')
+  collection?: string;              // Collection to search ('collection-a' | 'collection-b')
   prefer_steps?: boolean;           // Format as step-by-step guide
   max_tokens?: number;              // Maximum response tokens
   userId?: string;                  // User identifier for logging
@@ -668,13 +668,13 @@ interface AskRequest {
 **Response Format:**
 ```json
 {
-  "answer": "# PowerSchool PSSIS-Admin Configuration\n\n## Summary\n...",
+  "answer": "# Documentation Configuration\n\n## Summary\n...",
   "summary": "Brief summary of the answer",
   "steps": ["Step 1", "Step 2", "Step 3"],
   "citations": [
     {
-      "title": "PowerSchool Documentation",
-      "url": "https://ps.powerschool-docs.com/..."
+      "title": "Documentation",
+      "url": "https://docs.example.com/..."
     }
   ],
   "retrieved_docs": [
@@ -682,7 +682,7 @@ interface AskRequest {
       "id": "doc_123",
       "score": 0.95,
       "excerpt": "Relevant document excerpt...",
-      "collection": "pssis-admin"
+      "collection": "collection-a"
     }
   ]
 }
@@ -693,8 +693,8 @@ interface AskRequest {
 The API enforces collection validation:
 ```bash
 # Valid collections
-"collection": "pssis-admin"    ✅
-"collection": "schoology"      ✅
+"collection": "collection-a"    ✅
+"collection": "collection-b"    ✅
 
 # Invalid collection (returns 400 error)
 "collection": "invalid"        ❌
@@ -705,21 +705,21 @@ The API enforces collection validation:
 {
   "error": "Validation failed",
   "details": {
-    "collection": "must be one of [pssis-admin, schoology]"
+    "collection": "must be one of [collection-a, collection-b]"
   }
 }
 ```
 
 ### 3. Collection-Specific Examples
 
-**PSSIS-Admin Queries:**
+**Collection A Queries:**
 ```bash
 # Administrative tasks
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How do I set up student information system?",
-    "collection": "pssis-admin",
+    "query": "How do I set up the system?",
+    "collection": "collection-a",
     "prefer_steps": true
   }'
 
@@ -727,36 +727,36 @@ curl -X POST http://localhost:3000/api/v1/ask \
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "What are the grade setup requirements?",
-    "collection": "pssis-admin"
+    "query": "What are the setup requirements?",
+    "collection": "collection-a"
   }'
 ```
 
-**Schoology Queries:**
+**Collection B Queries:**
 ```bash
-# Course management
+# Resource management
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How do I create assignments in Schoology?",
-    "collection": "schoology",
+    "query": "How do I create new items?",
+    "collection": "collection-b",
     "prefer_steps": true
   }'
 
-# Student features
+# User features
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How can students submit homework?",
-    "collection": "schoology"
+    "query": "How can users submit items?",
+    "collection": "collection-b"
   }'
 ```
 
 ### 4. Collection Benefits in Practice
 
 **Isolated Knowledge Bases:**
-- PSSIS-Admin queries only return administrative documentation
-- Schoology queries only return LMS-related content
+- Collection A queries only return relevant documentation
+- Collection B queries only return related content
 - No context bleed between different systems
 
 **Improved Accuracy:**
@@ -779,8 +779,8 @@ curl http://localhost:3000/health
 {
   "status": "ok",
   "collections": {
-    "pssis-admin": { "documents": 506, "status": "ready" },
-    "schoology": { "documents": 235, "status": "ready" }
+    "collection-a": { "documents": 506, "status": "ready" },
+    "collection-b": { "documents": 235, "status": "ready" }
   }
 }
 ```
@@ -791,7 +791,7 @@ curl http://localhost:3000/health
 curl -X POST http://localhost:3000/api/v1/admin/reindex \
   -H "Content-Type: application/json" \
   -H "x-admin-key: your-admin-secret-key-here" \
-  -d '{"collection": "schoology"}'
+  -d '{"collection": "collection-b"}'
 ```
 
 ## 🐛 Debugging Locally
@@ -872,30 +872,30 @@ curl -X GET http://localhost:3000/health
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How do I configure attendance codes?",
+    "query": "How do I configure the system?",
     "prefer_steps": true
   }'
 
 # Expected JSON response:
 {
-  "answer": "# PowerSchool PSSIS-Admin Information\n\n## Steps\n1. Log into PowerSchool PSSIS-Admin\n2. Navigate to the relevant section\n3. Configure the settings as needed",
-  "summary": "Step-by-step instructions for How do I configure attendance codes?...",
+  "answer": "# System Configuration\n\n## Steps\n1. Access the system\n2. Navigate to the settings section\n3. Configure the settings as needed",
+  "summary": "Step-by-step instructions for configuration...",
   "steps": [
-    "Log into PowerSchool PSSIS-Admin",
-    "Navigate to the relevant section", 
+    "Access the system",
+    "Navigate to the settings section", 
     "Configure the settings as needed"
   ],
   "citations": [
     {
-      "title": "PowerSchool PSSIS-Admin Documentation",
-      "url": "https://ps.powerschool-docs.com/pssis-admin/latest/"
+      "title": "Documentation",
+      "url": "https://docs.example.com/"
     }
   ],
   "retrieved_docs": [
     {
       "id": "mock-doc-1",
       "score": 0.95,
-      "excerpt": "Mock document excerpt related to: How do I configure attendance codes?..."
+      "excerpt": "Mock document excerpt..."
     }
   ]
 }
@@ -912,7 +912,7 @@ curl -X POST http://localhost:3000/api/v1/admin/reindex \
 
 ## 🧪 RAG Pipeline Testing
 
-The RAG (Retrieval-Augmented Generation) implementation provides intelligent question-answering using the PowerSchool documentation. This section covers comprehensive testing of the RAG pipeline.
+The RAG (Retrieval-Augmented Generation) implementation provides intelligent question-answering using the documentation. This section covers comprehensive testing of the RAG pipeline.
 
 ### 1. Automated RAG Testing Script
 
@@ -941,7 +941,7 @@ The test suite includes three different query types that demonstrate the RAG cap
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How do I configure Attendance Codes in PowerSchool?",
+    "query": "How do I configure the system?",
     "prefer_steps": true,
     "max_tokens": 1500,
     "userId": "test-user-1"
@@ -953,7 +953,7 @@ curl -X POST http://localhost:3000/api/v1/ask \
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How do I add new users in PowerSchool PSSIS-Admin?",
+    "query": "How do I add new users?",
     "prefer_steps": true,
     "max_tokens": 1500,
     "userId": "test-user-2"
@@ -965,7 +965,7 @@ curl -X POST http://localhost:3000/api/v1/ask \
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "What is the PowerSchool Student Information System?",
+    "query": "What is the system overview?",
     "prefer_steps": false,
     "max_tokens": 1500,
     "userId": "test-user-3"
@@ -978,20 +978,20 @@ A successful RAG response follows this JSON structure:
 
 ```json
 {
-  "answer": "# PowerSchool PSSIS-Admin Configuration\n\n## Summary\nThis guide explains how to configure Attendance Codes in PowerSchool...\n\n## Steps\n1. Navigate to Setup > District > General\n2. Click on Attendance Codes\n3. Configure your attendance codes\n\n## References\n- [PowerSchool Documentation](https://ps.powerschool-docs.com/pssis-admin/latest/)",
+  "answer": "# System Configuration\n\n## Summary\nThis guide explains how to configure the system...\n\n## Steps\n1. Navigate to Settings\n2. Click on Configuration\n3. Update your settings\n\n## References\n- [Documentation](https://docs.example.com/)",
   
-  "summary": "Configure Attendance Codes by navigating to Setup > District > General and managing the attendance code settings.",
+  "summary": "Configure the system by navigating to Settings and managing the configuration.",
   
   "steps": [
-    "Navigate to Setup > District > General",
-    "Click on Attendance Codes",
-    "Configure your attendance codes according to your district's requirements"
+    "Navigate to Settings",
+    "Click on Configuration",
+    "Update your settings according to requirements"
   ],
   
   "citations": [
     {
-      "title": "PowerSchool PSSIS-Admin Documentation",
-      "url": "https://ps.powerschool-docs.com/pssis-admin/latest/attendance-codes"
+      "title": "Documentation",
+      "url": "https://docs.example.com/configuration"
     }
   ],
   
@@ -999,7 +999,7 @@ A successful RAG response follows this JSON structure:
     {
       "id": "doc_12345",
       "score": 0.892,
-      "excerpt": "Attendance codes are used to track student attendance patterns..."
+      "excerpt": "Configuration settings are used to customize the system..."
     }
   ]
 }
@@ -1049,7 +1049,7 @@ curl -X POST http://localhost:3000/api/v1/ask \
 curl -X POST http://localhost:3000/api/v1/ask \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "How do I create a new school year?",
+    "query": "How do I perform an action?",
     "prefer_steps": true,
     "max_tokens": 2000
   }'
@@ -1181,12 +1181,12 @@ curl -X POST http://localhost:3000/api/v1/ask \
 
 # 3. Test different response formats
 curl -X POST http://localhost:3000/api/v1/ask \
-  -d '{"query":"How to configure PowerSchool?","prefer_steps":true}' # Steps format
+  -d '{"query":"How to configure the system?","prefer_steps":true}' # Steps format
 curl -X POST http://localhost:3000/api/v1/ask \
-  -d '{"query":"What is PowerSchool?","prefer_steps":false}' # Overview format
+  -d '{"query":"What is the system?","prefer_steps":false}' # Overview format
 
 # 4. Verify citation accuracy
-# Check that URLs in citations are valid PowerSchool documentation links
+# Check that URLs in citations are valid documentation links
 
 # 5. Performance testing
 # Run multiple concurrent requests to test under load
@@ -1212,7 +1212,7 @@ This API service includes comprehensive Slack integration capabilities for messa
 2. Click **"Create New App"**
 3. Choose **"From scratch"**
 4. Provide:
-   - **App Name**: `PowerSchool AI Assistant` (or your preferred name)
+   - **App Name**: `AI Documentation Assistant` (or your preferred name)
    - **Workspace**: Select your development workspace
 5. Click **"Create App"**
 
@@ -1268,8 +1268,8 @@ Click **"Save Changes"** - Slack will verify your endpoint
 3. Configure the command:
    - **Command**: `/ask` (or your preferred name)
    - **Request URL**: `https://your-domain.com/slack/command`
-   - **Short Description**: `Ask PowerSchool documentation questions`
-   - **Usage Hint**: `[your question about PowerSchool]`
+   - **Short Description**: `Ask documentation questions`
+   - **Usage Hint**: `[your question]`
 
 #### Step 2: Save Command
 
@@ -1332,17 +1332,17 @@ The service provides the following Slack endpoints:
 
 2. **Mention your bot:**
    ```
-   @your-bot-name How do I configure attendance codes in PowerSchool?
+   @your-bot-name How do I configure the system?
    ```
 
 3. **Send a direct message:**
    - Open DM with your bot
-   - Send: `What is the PowerSchool Student Information System?`
+   - Send: `What is the system overview?`
 
 #### Test Slash Commands
 
 ```
-/ask How do I add new users in PowerSchool PSSIS-Admin?
+/ask How do I add new users?
 ```
 
 #### Test Interactive Components
@@ -1358,16 +1358,16 @@ The bot supports collection-specific queries:
 
 ```
 # Query specific collections
-pssis: How do I configure attendance codes?
-schoology: How do I create assignments?
-both: How do I sync grades between systems?
+collection-a: How do I configure settings?
+collection-b: How do I create items?
+both: How do I sync data between systems?
 ```
 
 #### Channel-Based Collection Hints
 
 Name your channels to get automatic collection routing:
-- `#pssis-admin-help` → Automatically searches PSSIS-Admin docs
-- `#schoology-support` → Automatically searches Schoology docs
+- `#collection-a-help` → Automatically searches Collection A docs
+- `#collection-b-support` → Automatically searches Collection B docs
 
 #### Rate Limiting
 
@@ -1434,22 +1434,22 @@ curl https://your-domain.com/slack/health
 #### Slack Workflow for Support Teams:
 
 ```
-User Query → Slack Bot → RAG Pipeline → PowerSchool Docs → Formatted Response
+User Query → Slack Bot → RAG Pipeline → Documentation → Formatted Response
                 ↓
           Log to Support System (optional)
 ```
 
 #### Multi-Channel Setup:
 
-- **#pssis-admin-help**: PSSIS-Admin questions and support
-- **#schoology-support**: Schoology LMS questions
-- **#powerschool-general**: Mixed questions, bot determines appropriate collection
+- **#collection-a-help**: Collection A questions and support
+- **#collection-b-support**: Collection B questions
+- **#general-help**: Mixed questions, bot determines appropriate collection
 
 ---
 
 ### 12. Interactive Features
 
-The PowerSchool AI Assistant now includes interactive features that enhance user experience with every bot response.
+The AI Assistant now includes interactive features that enhance user experience with every bot response.
 
 #### Interactive Buttons
 
@@ -1490,7 +1490,7 @@ follow-up context           and sources
 
 1. **Initial Query:**
    ```
-   @PowerSchool-Bot How do I configure attendance codes?
+   @AI-Bot How do I configure the system?
    ```
 
 2. **Bot Response with Buttons:**
@@ -1499,14 +1499,14 @@ follow-up context           and sources
    - **🔄 Ask Follow-up** button - click to continue conversation
 
 3. **Show Sources Modal:**
-   - Lists all PowerSchool documentation used
+   - Lists all documentation used
    - Shows relevance scores (e.g., "95% match")
    - Provides direct links to documentation pages
    - Option to copy all URLs for reference
 
 4. **Follow-up Conversation:**
    - User clicks "Ask Follow-up" → Modal opens
-   - User types: "What about tardiness codes?"
+   - User types: "What about advanced settings?"
    - Bot provides contextual response in thread
    - Follow-up response also includes interactive buttons
 
@@ -1531,12 +1531,12 @@ The interactive features utilize:
 ✅ **Immediate Source Access** - Users can verify information instantly
 ✅ **Seamless Follow-ups** - Continue conversations without losing context
 ✅ **Organized Threads** - Follow-up responses appear in organized threads
-✅ **Reference Documentation** - Easy access to original PowerSchool docs
+✅ **Reference Documentation** - Easy access to original documentation
 ✅ **Improved Trust** - Transparent source attribution builds confidence
 
-**🎉 Your PowerSchool AI Assistant is now ready with Interactive Features!**
+**🎉 Your AI Assistant is now ready with Interactive Features!**
 
-Users can now get instant, accurate answers to PowerSchool documentation questions directly in Slack through @mentions, DMs, or slash commands, with enhanced interactivity for source verification and follow-up conversations.
+Users can now get instant, accurate answers to documentation questions directly in Slack through @mentions, DMs, or slash commands, with enhanced interactivity for source verification and follow-up conversations.
 
 ## 🧪 Slack Integration Testing
 
@@ -1571,7 +1571,7 @@ The Slack e2e test suite validates **17 comprehensive test scenarios** covering 
 - **Invalid Event Rejection** - Proper error responses for malformed events
 
 #### Command Processing Tests (2 tests)
-- **Slash Command Processing** - `/ask` command with Schoology queries
+- **Slash Command Processing** - `/ask` command with queries
 - **Empty Command Handling** - Graceful handling of commands without text
 
 #### Interactive Components Tests (2 tests)
@@ -1579,7 +1579,7 @@ The Slack e2e test suite validates **17 comprehensive test scenarios** covering 
 - **Malformed Payload Handling** - Error handling for invalid action data
 
 #### Error Handling Tests (2 tests)
-- **Unsupported Command Graceful Handling** - Non-PowerSchool queries
+- **Unsupported Command Graceful Handling** - Non-specific queries
 - **Missing Configuration Recovery** - Service resilience testing
 
 #### Health Monitoring Tests (2 tests)
@@ -1614,7 +1614,7 @@ Event Receipt → Signature Validation → RAG Processing → Response Formattin
 ```typescript
 // Isolated component testing with mocks
 - Slack Web API: Mocked for response validation
-- RAG Pipeline: Mocked with realistic PowerSchool responses
+- RAG Pipeline: Mocked with realistic responses
 - Vector Store: Mocked for consistent test results
 - External APIs: Mocked to prevent external dependencies
 ```
@@ -1759,7 +1759,7 @@ The comprehensive test suite ensures the Slack integration is production-ready w
 
 ## 🤖 Microsoft Teams Integration
 
-The PowerSchool AI Assistant provides native Microsoft Teams integration through the Bot Framework, offering the same intelligent question-answering capabilities with Teams-specific interactive components.
+The AI Assistant provides native Microsoft Teams integration through the Bot Framework, offering the same intelligent question-answering capabilities with Teams-specific interactive components.
 
 ### 1. Prerequisites for Teams Integration
 
@@ -1780,7 +1780,7 @@ The PowerSchool AI Assistant provides native Microsoft Teams integration through
 2. Go to **Azure Active Directory** → **App registrations**
 3. Click **"New registration"**
 4. Configure:
-   - **Name**: `PowerSchool AI Assistant Bot`
+   - **Name**: `AI Assistant Bot`
    - **Supported account types**: Select based on your organization needs
    - **Redirect URI**: Leave blank for now
 5. Click **"Register"**
@@ -1790,7 +1790,7 @@ The PowerSchool AI Assistant provides native Microsoft Teams integration through
 1. In your new app registration, go to **"Certificates & secrets"**
 2. Click **"New client secret"**
 3. Configure:
-   - **Description**: `PowerSchool AI Bot Secret`
+   - **Description**: `AI Bot Secret`
    - **Expires**: Choose appropriate duration (12-24 months recommended)
 4. Click **"Add"**
 5. **Copy the secret value immediately** - you won't be able to see it again
@@ -1809,9 +1809,9 @@ The PowerSchool AI Assistant provides native Microsoft Teams integration through
 1. Visit **[Bot Framework Portal](https://dev.botframework.com/)**
 2. Click **"Create a Bot"** → **"Register an existing bot built using Bot Framework SDK"**
 3. Configure:
-   - **Bot handle**: `powerschool-ai-assistant` (must be unique)
-   - **Display name**: `PowerSchool AI Assistant`
-   - **Description**: `AI-powered assistant for PowerSchool documentation`
+   - **Bot handle**: `ai-assistant` (must be unique)
+   - **Display name**: `AI Assistant`
+   - **Description**: `AI-powered assistant for documentation`
    - **Icon**: Upload your bot icon (optional)
    - **Messaging endpoint**: `https://your-domain.com/teams/messages`
    - **Microsoft App ID**: Use the Application ID from your Azure AD app registration
@@ -1857,7 +1857,7 @@ Create a `manifest.json` file for your Teams app:
   "manifestVersion": "1.16",
   "version": "1.0.0",
   "id": "12345678-1234-1234-1234-123456789012",
-  "packageName": "com.powerschool.ai.assistant",
+  "packageName": "com.example.ai.assistant",
   "developer": {
     "name": "Your Organization",
     "websiteUrl": "https://your-website.com",
@@ -1869,12 +1869,12 @@ Create a `manifest.json` file for your Teams app:
     "outline": "outline.png"
   },
   "name": {
-    "short": "PowerSchool AI",
-    "full": "PowerSchool AI Assistant"
+    "short": "AI Assistant",
+    "full": "AI Documentation Assistant"
   },
   "description": {
-    "short": "AI assistant for PowerSchool documentation",
-    "full": "Get instant answers to PowerSchool questions with AI-powered documentation search"
+    "short": "AI assistant for documentation",
+    "full": "Get instant answers to documentation questions with AI-powered search"
   },
   "accentColor": "#0078D4",
   "bots": [
@@ -1931,12 +1931,12 @@ The service provides the following Teams endpoints:
 
 2. **Send a message:**
    ```
-   How do I configure attendance codes in PowerSchool?
+   How do I configure the system?
    ```
 
 3. **Test in a team channel:**
    ```
-   @PowerSchool AI Assistant What is the PowerSchool Student Information System?
+   @AI Assistant What is the system overview?
    ```
 
 #### Test Interactive Components
@@ -1970,9 +1970,9 @@ The service provides the following Teams endpoints:
 Same as Slack, Teams supports collection-specific queries:
 
 ```
-pssis: How do I configure attendance codes?
-schoology: How do I create assignments?
-both: How do I sync grades between systems?
+collection-a: How do I configure settings?
+collection-b: How do I create items?
+both: How do I sync data between systems?
 ```
 
 #### Tenant-Based Security
@@ -2067,9 +2067,9 @@ This architecture ensures:
 
 ---
 
-**🎉 Your PowerSchool AI Assistant is now ready for Microsoft Teams!**
+**🎉 Your AI Assistant is now ready for Microsoft Teams!**
 
-Users can get instant, accurate answers to PowerSchool documentation questions directly in Teams through @mentions, private chats, or team conversations, with rich interactive components powered by Adaptive Cards.
+Users can get instant, accurate answers to documentation questions directly in Teams through @mentions, private chats, or team conversations, with rich interactive components powered by Adaptive Cards.
 
 ## 🚨 Troubleshooting
 
@@ -2094,10 +2094,10 @@ make && sudo make install
 
 #### "API key missing"
 ```bash
-# Error: OPENAI_API_KEY is required
+# Error: API key is required
 # Solutions:
 1. Check .env file exists: ls -la .env
-2. Verify API key format: starts with 'sk-'
+2. Verify API key format
 3. Restart server after env changes
 4. Check for extra spaces/quotes in .env
 ```
@@ -2107,10 +2107,10 @@ make && sudo make install
 # Error: 429 Too Many Requests
 # Solutions:
 1. Wait for rate limit reset
-2. Upgrade OpenAI plan
+2. Upgrade API provider plan
 3. Reduce MAX_PAGES in .env
 4. Increase CRAWL_DELAY_MS
-5. Use alternative provider (ANTHROPIC_API_KEY)
+5. Use alternative provider
 ```
 
 #### "Database connection failed"
@@ -2166,8 +2166,8 @@ net start postgresql-x64-14
 
 ```bash
 # Option 1: Drop and recreate database
-psql -U postgres -c "DROP DATABASE IF EXISTS powerschool_rag;"
-psql -U postgres -c "CREATE DATABASE powerschool_rag;"
+psql -U postgres -c "DROP DATABASE IF EXISTS qlarity_rag;"
+psql -U postgres -c "CREATE DATABASE qlarity_rag;"
 
 # Run migrations and seed
 npm run db:migrate
@@ -2179,7 +2179,7 @@ npm run db:migrate
 npm run seed
 
 # Option 3: Clear documents table only
-psql -U postgres -d powerschool_rag -c "TRUNCATE documents CASCADE;"
+psql -U postgres -d qlarity_rag -c "TRUNCATE documents CASCADE;"
 npm run seed
 ```
 
@@ -2189,17 +2189,17 @@ npm run seed
 # Check Node.js version
 node --version  # Should be >= 18.0.0
 
-# Check npm version  
+# Check npm version
 npm --version   # Should be >= 9.0.0
 
 # Verify TypeScript compilation
 npm run type-check
 
 # Test database connection
-psql -U postgres -d powerschool_rag -c "SELECT version();"
+psql -U postgres -d qlarity_rag -c "SELECT version();"
 
 # Check pgvector installation
-psql -U postgres -d powerschool_rag -c "SELECT * FROM pg_extension WHERE extname = 'vector';"
+psql -U postgres -d qlarity_rag -c "SELECT * FROM pg_extension WHERE extname = 'vector';"
 
 # Verify environment variables
 npm run dev 2>&1 | grep -i "api key\|database"
