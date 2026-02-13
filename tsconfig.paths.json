@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./dist/src",
+    "paths": {
+      "@/*": ["*"],
+      "@/adapters/*": ["adapters/*"],
+      "@/api/*": ["api/*"],
+      "@/core/*": ["core/*"],
+      "@/middleware/*": ["middleware/*"],
+      "@/utils/*": ["utils/*"],
+      "@/types/*": ["types/*"]
+    }
+  }
+}

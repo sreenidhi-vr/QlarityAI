@@ -1,0 +1,219 @@
+{
+  "slackEventUrlVerification": {
+    "token": "verification_token",
+    "challenge": "3eZbrw1aBm2rZbRNFssFAhrMAzI",
+    "type": "url_verification"
+  },
+  
+  "slackEventAppMention": {
+    "token": "verification_token",
+    "team_id": "T1234567890",
+    "api_app_id": "A1234567890",
+    "event": {
+      "type": "app_mention",
+      "user": "U2147483697",
+      "text": "<@U0123456789> How do I enroll students in PSSIS?",
+      "ts": "1355517523.000005",
+      "channel": "C2147483705",
+      "event_ts": "1355517523.000005",
+      "channel_type": "channel"
+    },
+    "type": "event_callback",
+    "event_id": "Ev08MFMKH6",
+    "event_time": 1234567890
+  },
+
+  "slackEventDirectMessage": {
+    "token": "verification_token",
+    "team_id": "T1234567890",
+    "api_app_id": "A1234567890",
+    "event": {
+      "type": "message",
+      "channel": "D024BE91L",
+      "user": "U2147483697",
+      "text": "pssis: What are the system requirements?",
+      "ts": "1355517523.000005",
+      "event_ts": "1355517523.000005",
+      "channel_type": "im"
+    },
+    "type": "event_callback",
+    "event_id": "Ev08MFMKH7",
+    "event_time": 1234567890
+  },
+
+  "slackSlashCommand": {
+    "token": "gIkuvaNzQIHg97ATvDxqgjtO",
+    "team_id": "T0001",
+    "team_domain": "example",
+    "enterprise_id": "E0001",
+    "enterprise_name": "Globular%20Construct%20Inc",
+    "channel_id": "C2147483705",
+    "channel_name": "test",
+    "user_id": "U2147483697",
+    "user_name": "Steve",
+    "command": "/ask-powerschool",
+    "text": "schoology: How to create assignments?",
+    "response_url": "https://hooks.slack.com/commands/1234/5678",
+    "trigger_id": "13345224609.738474920.8088930838d88f008e0"
+  },
+
+  "slackInteractiveButton": {
+    "type": "block_actions",
+    "user": {
+      "id": "U2147483697",
+      "username": "Steve",
+      "name": "Steve",
+      "team_id": "T1234567890"
+    },
+    "api_app_id": "A1234567890",
+    "token": "verification_token",
+    "container": {
+      "type": "message",
+      "message_ts": "1548261234.000200"
+    },
+    "trigger_id": "13345224609.738474920.8088930838d88f008e0",
+    "team": {
+      "id": "T1234567890",
+      "domain": "example"
+    },
+    "enterprise": {
+      "id": "E1234567890",
+      "name": "Example Enterprise"
+    },
+    "is_enterprise_install": false,
+    "channel": {
+      "id": "C2147483705",
+      "name": "test"
+    },
+    "message": {
+      "type": "message",
+      "user": "U0123456789",
+      "ts": "1548261234.000200",
+      "bot_id": "B0123456789"
+    },
+    "state": {
+      "values": {}
+    },
+    "response_url": "https://hooks.slack.com/actions/T1234567890/1234567890/abcdef",
+    "actions": [
+      {
+        "action_id": "show_sources",
+        "block_id": "section567",
+        "text": {
+          "type": "plain_text",
+          "text": "Show Sources"
+        },
+        "value": "show_sources",
+        "type": "button",
+        "action_ts": "1548426417.840180"
+      }
+    ]
+  },
+
+  "expectedDetailsResponse": {
+    "text": "Information about student enrollment in PSSIS",
+    "blocks": [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "*Student Enrollment Overview*\n\nStudent enrollment in PowerSchool PSSIS involves registering new students into the system and assigning them to appropriate schools and grade levels. The process includes data entry, verification, and integration with state reporting systems.\n\n*Key Points:*\n• Requires proper documentation and verification\n• Integrates with state student information systems\n• Supports both manual and bulk enrollment processes"
+        }
+      },
+      {
+        "type": "actions",
+        "elements": [
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "📋 Show Sources"
+            },
+            "value": "show_sources",
+            "action_id": "show_sources"
+          },
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "🔄 Ask Follow-up"
+            },
+            "value": "ask_followup",
+            "action_id": "ask_followup"
+          }
+        ]
+      }
+    ],
+    "response_type": "in_channel"
+  },
+
+  "expectedInstructionsResponse": {
+    "text": "Step-by-step instructions for student enrollment",
+    "blocks": [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "*How to Enroll Students in PSSIS*\n\n1. Navigate to the Student Information section\n2. Click 'Add New Student' or use bulk enrollment\n3. Enter required student demographics\n4. Verify documentation and eligibility\n5. Assign to appropriate school and grade level\n6. Submit for processing and state reporting\n\n*Prerequisites:* Admin access, required documentation\n*Estimated time:* 10-15 minutes per student"
+        }
+      },
+      {
+        "type": "actions",
+        "elements": [
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "📋 Show Sources"
+            },
+            "value": "show_sources",
+            "action_id": "show_sources"
+          }
+        ]
+      }
+    ],
+    "response_type": "in_channel"
+  },
+
+  "expectedSourcesResponse": {
+    "text": "Sources for your query",
+    "blocks": [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "📋 *Sources* (3 found)\n\n1. *PSSIS Admin Guide - Student Enrollment* (92% match)\n   Complete guide to enrolling students including required fields and validation rules...\n   https://ps.powerschool-docs.com/pssis-admin/enrollment\n\n2. *Student Information Management* (87% match)\n   Overview of student data management features and enrollment workflows...\n   https://ps.powerschool-docs.com/pssis-admin/student-info\n\n3. *Bulk Enrollment Procedures* (84% match)\n   Instructions for enrolling multiple students simultaneously using import features...\n   https://ps.powerschool-docs.com/pssis-admin/bulk-enrollment"
+        }
+      }
+    ]
+  },
+
+  "expectedErrorResponse": {
+    "text": "I couldn't find any relevant information for your query. Try rephrasing your question or being more specific.",
+    "blocks": [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "❌ I couldn't find any relevant information for your query. Try rephrasing your question or being more specific."
+        }
+      },
+      {
+        "type": "context",
+        "elements": [
+          {
+            "type": "mrkdwn",
+            "text": "💡 Try being more specific or check out our <https://support.powerschool.com/|support documentation>"
+          }
+        ]
+      }
+    ]
+  },
+
+  "testSignatureGeneration": {
+    "body": "{\"test\":\"payload\"}",
+    "timestamp": "1234567890",
+    "secret": "test_signing_secret",
+    "expectedSignature": "v0=a2114d57b48eac39b9ad189dd8316235a7b4a8d21a10bd27519666489c69b503"
+  }
+}
